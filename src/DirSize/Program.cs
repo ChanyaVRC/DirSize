@@ -21,7 +21,14 @@ internal class Program
 
         if (!Directory.Exists(_parameters.RootDirectory))
         {
-            logger.Log($"Directory \"{_parameters.RootDirectory}\" is not exist.");
+            if (File.Exists(_parameters.RootDirectory))
+            {
+                logger.Log($"\"{_parameters.RootDirectory}\" is file. Please enter the directory.");
+            }
+            else
+            {
+                logger.Log($"\"{_parameters.RootDirectory}\" is not exist.");
+            }
             return;
         }
 
