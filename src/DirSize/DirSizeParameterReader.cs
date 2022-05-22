@@ -4,20 +4,20 @@ internal class DirSizeParameters : Parameters
 {
     private string? _targetDirectory = null;
 
-    public string RootDirectory => _targetDirectory!;
+    public string RootDirectory => _targetDirectory ?? @".\";
     public bool IsRecursively { get; private set; } = false;
     public bool IsSingleTask { get; private set; } = false;
     public bool IsOutputAsCsv { get; private set; } = false;
     public bool IsSilent { get; private set; } = false;
 
-    public DirSizeParameters(IEnumerable<string> parameters) : base(parameters, false)
+    public DirSizeParameters(IEnumerable<string> parameters) : base(parameters, true)
     {
 
     }
 
     protected override string? ReadNonOptionParameter(ParamInfo parameter)
     {
-        if (_targetDirectory == null)
+        if (_targetDirectory == null && parameter.Index == 0)
         {
             _targetDirectory = Path.GetFullPath(parameter.Content);
             IsRequestOption = true;
