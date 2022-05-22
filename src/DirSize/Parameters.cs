@@ -1,23 +1,26 @@
-﻿namespace BuildSoft.Command.DirSize;
+﻿using BuildSoft.Command.DirSize.Logging;
+
+namespace BuildSoft.Command.DirSize;
 
 public abstract class Parameters
 {
-    public Parameters(IEnumerable<string> parameters, bool isRequestOptionAtFirst = true)
-        : this(parameters.ToArray(), isRequestOptionAtFirst)
+    public Parameters(IEnumerable<string> parameters, bool isRequestOptionAtFirst = true, ILogger? logger = null)
+        : this(parameters.ToArray(), isRequestOptionAtFirst, logger)
     {
 
     }
 
-    public Parameters(string[] parameters, bool isRequestOptionAtFirst = true)
+    public Parameters(string[] parameters,  bool isRequestOptionAtFirst = true, ILogger? logger = null)
     {
         IsRequestOption = isRequestOptionAtFirst;
+        logger ??= new ConsoleLogger();
 
         for (int i = 0; i < parameters.Length; i++)
         {
             string? resultMessage = ReadCommand(new(parameters[i], i));
             if (resultMessage != null)
             {
-                Console.WriteLine(resultMessage);
+                logger.Log(resultMessage);
             }
         }
     }

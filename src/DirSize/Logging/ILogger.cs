@@ -1,6 +1,6 @@
 ﻿namespace BuildSoft.Command.DirSize.Logging;
 
-interface ILogger
+public interface ILogger
 {
     void Log() => Log(string.Empty);
     void Log(string message);

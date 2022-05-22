@@ -42,8 +42,6 @@ internal class Program
         logger.Log($"Evaluted time : {evalutedTime}");
         logger.Log($"Output time   : {stopwatch.Elapsed - evalutedTime}");
         logger.Log($"Running time  : {stopwatch.Elapsed}");
-
-        return;
     }
 
     static async ValueTask<long> GetDirectorySizeAsync(DirectoryInfo directory, Dictionary<DirectoryInfo, long>[] results, CancellationToken token)
@@ -61,10 +59,17 @@ internal class Program
         {
             size += files[i].Length;
         }
-        await Parallel.ForEachAsync(directory.EnumerateDirectories(), token, async (directory, token) =>
+        if (_parameters.IsNeedToAnalyzeRecursively)
         {
-            Interlocked.Add(ref size, await GetDirectorySizeAsync(directory, results, token));
-        });
+            await Parallel.ForEachAsync(directory.EnumerateDirectories(), token, async (directory, token) =>
+            {
+                long subDirectorySize = await GetDirectorySizeAsync(directory, results, token);
+                if (_parameters.IsIncludingSubDirectoriesSize)
+                {
+                    Interlocked.Add(ref size, subDirectorySize);
+                }
+            });
+        }
 
         long directoryHash = Unsafe.As<DirectoryInfo, IntPtr>(ref directory).ToInt64();
         var list = results[directoryHash % results.Length];
@@ -91,9 +96,16 @@ internal class Program
         {
             size += files[i].Length;
         }
-        foreach (var d in directory.EnumerateDirectories())
+        if (_parameters.IsNeedToAnalyzeRecursively)
         {
-            Interlocked.Add(ref size, GetDirectorySize(d, results));
+            foreach (var d in directory.EnumerateDirectories())
+            {
+                long subDirectorySize = GetDirectorySize(d, results);
+                if (_parameters.IsIncludingSubDirectoriesSize)
+                {
+                    size += subDirectorySize;
+                }
+            }
         }
 
         results.Add(directory, size);

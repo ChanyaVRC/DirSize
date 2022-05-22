@@ -9,6 +9,8 @@ internal class DirSizeParameters : Parameters
     public bool IsSingleTask { get; private set; } = false;
     public bool IsOutputAsCsv { get; private set; } = false;
     public bool IsSilent { get; private set; } = false;
+    public bool IsIncludingSubDirectoriesSize { get; private set; } = true;
+    public bool IsNeedToAnalyzeRecursively => IsIncludingSubDirectoriesSize || IsRecursively;
 
     public DirSizeParameters(IEnumerable<string> parameters) : base(parameters, true)
     {
@@ -48,6 +50,11 @@ internal class DirSizeParameters : Parameters
 
             case "csv":
                 IsOutputAsCsv = true;
+                return null;
+
+            case "top":
+            case "t":
+                IsIncludingSubDirectoriesSize = false;
                 return null;
         }
         return $"{parameter.Content} is a invalid parameter.";
