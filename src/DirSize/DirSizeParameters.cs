@@ -9,7 +9,7 @@ internal class DirSizeParameters : Parameters
     public string RootDirectory => _targetDirectory ?? @".\";
     public bool IsRecursively { get; private set; } = false;
     public bool IsSingleTask { get; private set; } = false;
-    public OutputFormat OutputFormat { get; private set; } = OutputFormat.None;
+    public EmitFormat EmitFormat { get; private set; } = EmitFormat.None;
     public bool IsSilent { get; private set; } = false;
     public bool IsIncludingSubDirectoriesSize { get; private set; } = true;
     public bool IsNeedToAnalyzeRecursively => IsIncludingSubDirectoriesSize || IsRecursively;
@@ -51,11 +51,11 @@ internal class DirSizeParameters : Parameters
                 return null;
 
             case "csv":
-                OutputFormat = OutputFormat.Csv;
+                EmitFormat = EmitFormat.Csv;
                 return null;
 
             case "tsv":
-                OutputFormat = OutputFormat.Tsv;
+                EmitFormat = EmitFormat.Tsv;
                 return null;
 
             case "top":

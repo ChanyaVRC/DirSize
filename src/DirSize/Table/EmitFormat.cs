@@ -1,6 +1,6 @@
 ﻿namespace BuildSoft.Command.DirSize.Table;
 
-internal enum OutputFormat
+internal enum EmitFormat
 {
     None,
     Csv,

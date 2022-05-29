@@ -181,19 +181,19 @@ internal class Program
 
         var contents = results.DirectoryContents.OrderBy(v => v.Key.FullName);
 
-        switch (_parameters.OutputFormat)
+        switch (_parameters.EmitFormat)
         {
-            case OutputFormat.None:
-            case OutputFormat.FixedLength:
-            case OutputFormat.Csv:
-            case OutputFormat.Tsv:
+            case EmitFormat.None:
+            case EmitFormat.FixedLength:
+            case EmitFormat.Csv:
+            case EmitFormat.Tsv:
                 TableEmitter<KeyValuePair<DirectoryInfo, DirectorieContent>> emitter = new();
                 emitter.RegisterColumn(new("Directory Path", ColumnType.String, v => v.Key.FullName));
                 emitter.RegisterColumn(new("Size", ColumnType.Int64, v => v.Value.Size.ToString()));
                 emitter.RegisterColumn(new("File Count", ColumnType.Int32, v => v.Value.FileCount.ToString()));
                 emitter.RegisterColumn(new("Directory Count", ColumnType.Int32, v => v.Value.DirectoryCount.ToString()));
 
-                foreach (var rows in emitter.Emit(contents, _parameters.OutputFormat, true))
+                foreach (var rows in emitter.Emit(contents, _parameters.EmitFormat, true))
                 {
                     writer.WriteLine(rows);
                 }

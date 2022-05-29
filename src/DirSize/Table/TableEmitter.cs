@@ -11,15 +11,15 @@ class TableEmitter<T>
         _columns.Add(columnInfo);
     }
 
-    public IEnumerable<string> Emit(IEnumerable<T> values, OutputFormat format, bool isRequiredHeader = true)
+    public IEnumerable<string> Emit(IEnumerable<T> values, EmitFormat format, bool isRequiredHeader = true)
     {
-        if (format == OutputFormat.None)
+        if (format == EmitFormat.None)
         {
-            format = OutputFormat.FixedLength;
+            format = EmitFormat.FixedLength;
         }
 
         int[] sizes = new int[_columns.Count];
-        if (format == OutputFormat.FixedLength)
+        if (format == EmitFormat.FixedLength)
         {
             if (values is not ICollection<T>)
             {
@@ -37,7 +37,7 @@ class TableEmitter<T>
             : EmitRows(values, format, sizes);
     }
 
-    private IEnumerable<string> EmitHeader(OutputFormat format, int[] sizes)
+    private IEnumerable<string> EmitHeader(EmitFormat format, int[] sizes)
     {
         StringBuilder builder = new();
         char separator = _separators[format];
@@ -51,7 +51,7 @@ class TableEmitter<T>
         builder.Length--;
         yield return builder.ToString();
 
-        if (format != OutputFormat.FixedLength)
+        if (format != EmitFormat.FixedLength)
         {
             yield break;
         }
@@ -66,7 +66,7 @@ class TableEmitter<T>
         yield return builder.ToString();
     }
 
-    private IEnumerable<string> EmitRows(IEnumerable<T> values, OutputFormat format, int[] sizes)
+    private IEnumerable<string> EmitRows(IEnumerable<T> values, EmitFormat format, int[] sizes)
     {
         if (_columns.Count <= 0)
         {
@@ -75,12 +75,12 @@ class TableEmitter<T>
         return EnumerateRows(values, format, sizes);
     }
 
-    private static readonly Dictionary<OutputFormat, char> _separators = new()
+    private static readonly Dictionary<EmitFormat, char> _separators = new()
     {
-        { OutputFormat.None,        ' '  },
-        { OutputFormat.Csv,         ','  },
-        { OutputFormat.Tsv,         '\t' },
-        { OutputFormat.FixedLength, ' '  },
+        { EmitFormat.None,        ' '  },
+        { EmitFormat.Csv,         ','  },
+        { EmitFormat.Tsv,         '\t' },
+        { EmitFormat.FixedLength, ' '  },
     };
     private static readonly Dictionary<ColumnType, Func<IEnumerable<T>, ColumnInfo<T>, int>> _sizeCalculators = new()
     {
@@ -90,7 +90,7 @@ class TableEmitter<T>
         { ColumnType.Int32,   (v, c) => 11 /* int.MinValue.ToString().Length  */ },
     };
 
-    private IEnumerable<string> EnumerateRows(IEnumerable<T> values, OutputFormat format, int[] sizes)
+    private IEnumerable<string> EnumerateRows(IEnumerable<T> values, EmitFormat format, int[] sizes)
     {
         StringBuilder builder = new();
         char separator = _separators[format];
@@ -108,9 +108,9 @@ class TableEmitter<T>
         }
     }
 
-    private static void AppendValue(StringBuilder builder, string value, ColumnType type, OutputFormat format, int fixedSize)
+    private static void AppendValue(StringBuilder builder, string value, ColumnType type, EmitFormat format, int fixedSize)
     {
-        bool isNeedToTypeFormat = format == OutputFormat.Csv || format == OutputFormat.Tsv;
+        bool isNeedToTypeFormat = format == EmitFormat.Csv || format == EmitFormat.Tsv;
         bool isStringType = type.HasFlag(ColumnType.String);
         bool isIntegerType = type.HasFlag(ColumnType.Integer);
 
@@ -120,12 +120,12 @@ class TableEmitter<T>
         {
             builder.Append('\"');
         }
-        if (isIntegerType && format == OutputFormat.FixedLength)
+        if (isIntegerType && format == EmitFormat.FixedLength)
         {
             builder.Append(' ', Math.Max(0, fixedSize - fixedValueLength));
         }
         builder.Append(GetEscapedString(value, format));
-        if (isStringType && format == OutputFormat.FixedLength)
+        if (isStringType && format == EmitFormat.FixedLength)
         {
             builder.Append(' ', Math.Max(0, fixedSize - fixedValueLength));
         }
@@ -136,9 +136,9 @@ class TableEmitter<T>
     }
 
     private static int GetFixedStringLength(string s) => s.Length;
-    private static string GetEscapedString(string s, OutputFormat format)
+    private static string GetEscapedString(string s, EmitFormat format)
     {
-        if (format == OutputFormat.Csv)
+        if (format == EmitFormat.Csv)
         {
             return s.Replace("\"", "\"\"");
         }
