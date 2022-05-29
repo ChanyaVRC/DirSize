@@ -10,7 +10,7 @@ public abstract class Parameters
 
     }
 
-    public Parameters(string[] parameters,  bool isRequestOptionAtFirst = true, ILogger? logger = null)
+    public Parameters(string[] parameters, bool isRequestOptionAtFirst = true, ILogger? logger = null)
     {
         IsRequestOption = isRequestOptionAtFirst;
         logger ??= new ConsoleLogger();

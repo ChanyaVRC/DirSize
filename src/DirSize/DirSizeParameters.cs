@@ -1,4 +1,6 @@
-﻿namespace BuildSoft.Command.DirSize;
+﻿using BuildSoft.Command.DirSize.Table;
+
+namespace BuildSoft.Command.DirSize;
 
 internal class DirSizeParameters : Parameters
 {
@@ -7,7 +9,7 @@ internal class DirSizeParameters : Parameters
     public string RootDirectory => _targetDirectory ?? @".\";
     public bool IsRecursively { get; private set; } = false;
     public bool IsSingleTask { get; private set; } = false;
-    public bool IsOutputAsCsv { get; private set; } = false;
+    public OutputFormat OutputFormat { get; private set; } = OutputFormat.None;
     public bool IsSilent { get; private set; } = false;
     public bool IsIncludingSubDirectoriesSize { get; private set; } = true;
     public bool IsNeedToAnalyzeRecursively => IsIncludingSubDirectoriesSize || IsRecursively;
@@ -49,7 +51,11 @@ internal class DirSizeParameters : Parameters
                 return null;
 
             case "csv":
-                IsOutputAsCsv = true;
+                OutputFormat = OutputFormat.Csv;
+                return null;
+
+            case "tsv":
+                OutputFormat = OutputFormat.Tsv;
                 return null;
 
             case "top":
