@@ -22,11 +22,10 @@ class TableEmitter<T>
         int[] sizes = new int[_columns.Count];
         if (format == EmitFormat.FixedLength)
         {
-            if (values is not ICollection<T>)
-            {
-                values = values.ToArray();
-            }
-            int size = values.Count();
+            ICollection<T> valueCollection = values as ICollection<T> ?? values.ToArray();
+            values = valueCollection;
+
+            int size = valueCollection.Count;
             for (int i = 0; i < sizes.Length; i++)
             {
                 var column = _columns[i];
@@ -83,10 +82,10 @@ class TableEmitter<T>
         { EmitFormat.Tsv,         '\t' },
         { EmitFormat.FixedLength, ' '  },
     };
-    private static readonly Dictionary<ColumnType, Func<IEnumerable<T>, ColumnInfo<T>, int>> _sizeCalculators = new()
+    private static readonly Dictionary<ColumnType, Func<ICollection<T>, ColumnInfo<T>, int>> _sizeCalculators = new()
     {
-        { ColumnType.String,  (v, c) => v.Any() ? v.Select(v=> GetFixedStringLength(c.GetValueFrom(v))).Max() : 0 },
-        { ColumnType.Integer, (v, c) => v.Any() ? v.Select(v=> GetFixedStringLength(c.GetValueFrom(v))).Max() : 0 },
+        { ColumnType.String,  (v, c) => v.Any() ? v.Max(v => GetFixedStringLength(c.GetValueFrom(v))) : 0 },
+        { ColumnType.Integer, (v, c) => v.Any() ? v.Max(v => GetFixedStringLength(c.GetValueFrom(v))) : 0 },
         { ColumnType.Int64,   (v, c) => 20 /* long.MinValue.ToString().Length */ },
         { ColumnType.Int32,   (v, c) => 11 /* int.MinValue.ToString().Length  */ },
     };
