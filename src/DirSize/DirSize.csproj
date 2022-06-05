@@ -21,4 +21,8 @@
 	  <None Include=".\.editorconfig" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <PackageReference Include="EastAsianWidth" Version="1.2.0" />
+	</ItemGroup>
+
 </Project>

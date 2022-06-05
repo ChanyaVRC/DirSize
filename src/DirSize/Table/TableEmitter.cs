@@ -1,4 +1,5 @@
-﻿using System.Buffers;
+﻿using Kodnix.Character;
+using System.Buffers;
 using System.Text;
 
 namespace BuildSoft.Command.DirSize.Table;
@@ -135,7 +136,7 @@ class TableEmitter<T>
         }
     }
 
-    private static int GetFixedStringLength(string s) => s.Length;
+    private static int GetFixedStringLength(string s) => EastAsianWidth.GetLength(s);
     private static string GetEscapedString(string s, EmitFormat format)
     {
         if (format == EmitFormat.Csv)
