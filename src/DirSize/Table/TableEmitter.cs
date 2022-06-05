@@ -30,7 +30,7 @@ class TableEmitter<T>
             for (int i = 0; i < sizes.Length; i++)
             {
                 var column = _columns[i];
-                sizes[i] = Math.Max(column.Name.Length, _sizeCalculators[column.Type].Invoke(values, column));
+                sizes[i] = Math.Max(GetFixedStringLength(column.Name), _sizeCalculators[column.Type].Invoke(valueCollection, column));
             }
         }
         return isRequiredHeader
