@@ -33,6 +33,7 @@ internal class Program
             return;
         }
 
+        logger.Log("Evaluting Now...");
         var results = await EvaluateAsync();
         var evalutedTime = stopwatch.Elapsed;
         WriteResult(results, Console.Out, logger);
