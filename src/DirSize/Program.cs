@@ -139,6 +139,7 @@ internal class Program
 
         IEnumerable<KeyValuePair<DirectoryInfo, DirectorieContent>> results;
         long sumSize = 0;
+        long directoryCount = 0;
 
         if (_parameters.IsSingleTask)
         {
@@ -147,6 +148,7 @@ internal class Program
             {
                 var content = GetDirectorySize(directory, singleTaskResults);
                 sumSize += content.Size;
+                directoryCount += content.DirectoryCount;
             }
 
             results = singleTaskResults;
@@ -162,6 +164,7 @@ internal class Program
             {
                 var content = await GetDirectorySizeAsync(directory, multiTaskResults, token);
                 Interlocked.Add(ref sumSize, content.Size);
+                Interlocked.Add(ref directoryCount, content.DirectoryCount);
             });
 
             results = multiTaskResults!.SelectMany(v => v);
@@ -173,13 +176,11 @@ internal class Program
                 .Join(results, outer => outer.FullName, inner => inner.Key.FullName, (_, inner) => inner);
         }
 
-        return new(results, sumSize);
+        return new(results, sumSize, directoryCount);
     }
 
     static void WriteResult(EvaluateResults results, TextWriter writer, ILogger logger)
     {
-        int count = 0;
-
         var contents = results.DirectoryContents.OrderBy(v => v.Key.FullName);
 
         switch (_parameters.EmitFormat)
@@ -207,10 +208,13 @@ internal class Program
 
         logger.Log();
         logger.Log($"Target directory size : {results.SumSize}");
-        logger.Log($"Directories count : {count}");
+        logger.Log($"Directories count : {results.DirectoryCount}");
     }
 
     private record struct DirectorieContent(long Size, int FileCount, int DirectoryCount);
-    private record struct EvaluateResults(IEnumerable<KeyValuePair<DirectoryInfo, DirectorieContent>> DirectoryContents, long SumSize);
+    private record struct EvaluateResults(
+        IEnumerable<KeyValuePair<DirectoryInfo, DirectorieContent>> DirectoryContents,
+        long SumSize,
+        long DirectoryCount);
 
 }
